@@ -11,8 +11,9 @@ import { useTaskContext } from "../context/TaskContextProvider";
 
 export default function TaskForm({ route }) {
   const navigation = useNavigation();
-  const [valueInput, setValueInput] = useState({ title: "", description: "" });
   const [editing, setEditing] = useState(false);
+  const [error, setError] = useState(false);
+  const [valueInput, setValueInput] = useState({ title: "", description: "" });
   const { createTask, getTask, updateTask } = useTaskContext();
 
   useEffect(() => {
@@ -31,6 +32,9 @@ export default function TaskForm({ route }) {
   };
 
   const handleSubmit = async () => {
+    if (valueInput.title.length < 3 || valueInput.description.length < 3)
+      return setError(true);
+
     if (!editing) {
       await createTask(valueInput);
     } else {
@@ -40,7 +44,7 @@ export default function TaskForm({ route }) {
   };
 
   return (
-    <ScrollView style={{ flexGrow: 1, paddingHorizontal: 22, paddingTop: 20 }}>
+    <ScrollView style={styles.container}>
       <Text style={styles.label}>Task</Text>
       <TextInput
         placeholder="Write a task"
@@ -66,19 +70,29 @@ export default function TaskForm({ route }) {
         multiline={true}
         numberOfLines={4}
       />
+
       <TouchableOpacity
-        //disabled
         activeOpacity={0.8}
         style={styles.containerButton}
         onPress={handleSubmit}
       >
         <Text style={styles.titleButton}>Send</Text>
       </TouchableOpacity>
+      {error && (
+        <Text style={styles.error}>
+          Fields are required. At least three characters
+        </Text>
+      )}
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flexGrow: 1,
+    paddingHorizontal: 22,
+    paddingTop: 20,
+  },
   input: {
     borderWidth: 1,
     height: 50,
@@ -106,5 +120,12 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
     fontWeight: "700",
     fontSize: 16,
+  },
+  error: {
+    color: "#fff",
+    marginTop: 26,
+    textAlign: "center",
+    letterSpacing: 0.5,
+    fontStyle: "italic",
   },
 });

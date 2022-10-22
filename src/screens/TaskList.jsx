@@ -7,18 +7,25 @@ import {
   TouchableOpacity,
   StatusBar,
   FlatList,
+  RefreshControl,
 } from "react-native";
 import TaskCard from "../components/TaskCard";
 import { useTaskContext } from "../context/TaskContextProvider";
+import Loading from "../components/Loading";
 
 export default function TaskList({ navigation }) {
   const isFocused = useIsFocused();
-  const { listTask, getTasks } = useTaskContext();
+  const { listTask, getTasks, onRefresh, refreshing, isLoading } =
+    useTaskContext();
   const { task } = listTask;
 
   useEffect(() => {
     getTasks();
   }, [isFocused]);
+
+  if (isLoading) {
+    return <Loading />;
+  }
 
   return (
     <View style={styles.container}>
@@ -27,6 +34,15 @@ export default function TaskList({ navigation }) {
         data={task}
         keyExtractor={(_, index) => index.toString()}
         showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 100 }}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={["#1B2430"]}
+            progressBackgroundColor="white"
+          />
+        }
         renderItem={({ item }) => <TaskCard task={item} />}
       />
       <TouchableOpacity
@@ -43,6 +59,8 @@ export default function TaskList({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    // backgroundColor: "red",
+    // marginBottom: 100,
   },
   containerButton: {
     backgroundColor: "#990000",

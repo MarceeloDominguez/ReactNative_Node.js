@@ -12,8 +12,8 @@ export const getTaskRequests = async (id) =>
 export const updateTaskRequests = async (id, newTask) =>
   await axios.put(`http://10.0.2.2:5000/task/${id}`, newTask);
 
-// export const toggleTaskDoneRequests = async (id, completed) =>
-//   await axios.put(`http://10.0.2.2:5000/task/${id}`, completed);
+export const deleteTaskRequests = async (id) =>
+  await axios.delete(`http://10.0.2.2:5000/task/${id}`);
 
 export const toggleTaskDoneRequests = async (id, completed) =>
   await axios.put(`http://10.0.2.2:5000/taskToggle/${id}`, completed);

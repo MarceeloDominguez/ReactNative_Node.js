@@ -1,6 +1,7 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useState } from "react";
 import {
   createTaskRequests,
+  deleteTaskRequests,
   getTaskRequests,
   getTasksRequests,
   toggleTaskDoneRequests,
@@ -11,6 +12,8 @@ const taskContext = createContext();
 
 export const TaskContextProvider = ({ children }) => {
   const [listTask, setListTask] = useState([]);
+  const [refreshing, setRefreshing] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const getTasks = async () => {
     try {
@@ -46,19 +49,40 @@ export const TaskContextProvider = ({ children }) => {
     }
   };
 
+  const deleteTask = async (id) => {
+    setIsLoading(true);
+    try {
+      const res = await deleteTaskRequests(id);
+      if (res.status === 202) {
+        setListTask(listTask.task.filter((task) => task._id !== id));
+        setIsLoading(false);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const toggleTaskDone = async (id) => {
     const taskFound = listTask.task.find((task) => task._id === id);
-    await toggleTaskDoneRequests(
+    const res = await toggleTaskDoneRequests(
       id,
       taskFound.completed === false ? true : false
     );
 
-    // setListTask(
-    //   listTask.task.map((task) =>
-    //     task._id === id ? { ...task, completed: !task.completed } : task
-    //   )
-    // );
+    setListTask(
+      listTask.task.map((task) => {
+        return task._id === id ? res.data : task;
+      })
+    );
   };
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+
+    await getTasks();
+
+    setRefreshing(false);
+  }, []);
 
   return (
     <taskContext.Provider
@@ -69,6 +93,10 @@ export const TaskContextProvider = ({ children }) => {
         getTask,
         getTasks,
         toggleTaskDone,
+        onRefresh,
+        refreshing,
+        deleteTask,
+        isLoading,
       }}
     >
       {children}
