@@ -30,6 +30,11 @@ export default function TaskList({ navigation }) {
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#1B2430" />
+      {task?.length === 0 && (
+        <View style={styles.containerNoTask}>
+          <Text style={styles.textNoTask}>There are no task</Text>
+        </View>
+      )}
       <FlatList
         data={task}
         keyExtractor={(_, index) => index.toString()}
@@ -59,8 +64,6 @@ export default function TaskList({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // backgroundColor: "red",
-    // marginBottom: 100,
   },
   containerButton: {
     backgroundColor: "#990000",
@@ -78,5 +81,16 @@ const styles = StyleSheet.create({
     fontSize: 35,
     bottom: 1,
     color: "white",
+  },
+  containerNoTask: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  textNoTask: {
+    fontSize: 18,
+    letterSpacing: 0.5,
+    fontWeight: "bold",
+    color: "#fff",
   },
 });
